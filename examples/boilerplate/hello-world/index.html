@@ -7,11 +7,61 @@
     <script src="../../../dist/aframe-master.js"></script>
   </head>
   <body>
-    <a-scene background="color: #ECECEC">
-      <a-box position="-1 0.5 -3" rotation="0 45 0" color="#4CC3D9" shadow></a-box>
-      <a-sphere position="0 1.25 -5" radius="1.25" color="#EF2D5E" shadow></a-sphere>
-      <a-cylinder position="1 0.75 -3" radius="0.5" height="1.5" color="#FFC65D" shadow></a-cylinder>
-      <a-plane position="0 0 -4" rotation="-90 0 0" width="4" height="4" color="#7BC8A4" shadow></a-plane>
+    <script>
+      AFRAME.registerComponent('apply-texture', {
+        init: function () {
+          // Wait for model to load.
+          this.el.addEventListener('model-loaded', () => {
+            // Grab the mesh / scene.
+            const obj = this.el.getObject3D('mesh');
+            // Go over the submeshes and modify materials we want.
+
+            const textureLoader = new THREE.TextureLoader();
+            const texture = textureLoader.load('Textures/absperrhut.png');
+            const ao = textureLoader.load('Textures/absperrhut_ao.png');
+            const metallic = textureLoader.load('Textures/absperrhut_metallic.png');
+            const smoothness = textureLoader.load('Textures/absperrhut_smoothness.png');
+            const normal = textureLoader.load('Textures/absperrhut_normal.png');
+           
+            obj.traverse(node => {  
+              node.material = new THREE.MeshStandardMaterial({
+                map: texture,
+                aoMap: ao,
+                metalnessMap: metallic,
+                roughnessMap: smoothness,
+                normalMap: normal,
+              });
+            });
+          });
+        }
+      });
+    </script>
+
+    <a-scene>
+      <a-entity light="type: ambient; intensity: 0.4;"></a-entity>
+      <a-entity light="type: directional;
+                   castShadow: true;
+                   intensity: 2.2;
+                   shadowCameraVisible: true;"
+            position="3 2 1.5">
+      </a-entity>
+    
+      <a-assets>
+        <img id="groundTexture" src="adrien-olichon-I_qdNZ9KVkA-unsplash.jpg" crossorigin>
+        <a-asset-item id="cone" src="absperrhut.obj"></a-asset-item>
+      </a-assets>
+        
+      <a-entity shadow="cast:true; receive:true" obj-model="obj: #cone" position="-1.9 0 2" rotation="0 0 0"  apply-texture ></a-entity>
+      <a-entity shadow="cast:true; receive:true" obj-model="obj: #cone" position="-2.3 0 1.2" rotation="0 30 0" apply-texture ></a-entity>
+      <a-entity shadow="cast:true; receive:true" obj-model="obj: #cone" position="-2.5 0 0.3" rotation="0 180 0" apply-texture ></a-entity>
+      <a-box shadow="cast:true; receive:true" position="1 0.25 1"  width=0.5 height=0.5 depth=2  color="#111111" ></a-box>
+      <a-plane shadow="cast:true; receive:true" rotation="-90 0 0" width="10" height="6" src="#groundTexture" shadow="receive: true"></a-plane>
+      <a-sky color="#ddddEC"></a-sky>
+
+      <a-entity position="0 0 4">
+        <a-camera></a-camera>
+      </a-entity>
+
     </a-scene>
   </body>
 </html>
